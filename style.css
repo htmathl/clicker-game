@@ -1,0 +1,151 @@
+@keyframes beat {
+    0% {
+      -webkit-transform: scale(1, 1);
+              transform: scale(1, 1);
+    }
+    100% {
+      -webkit-transform: scale(0.99,0.99);
+              transform: scale(0.99, 0.99);
+    }
+}
+
+@font-face {
+    font-family: fontinha;
+    src: url(./CormorantGaramond-Regular.ttf);
+}
+
+* {
+    font-family: fontinha;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    margin: auto;
+    background-color: black;
+    color: white;
+    font-size: 20px;
+    text-align: center;
+}
+
+div.flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    height: 100%;
+}
+
+.flex-content {
+    display: flex;
+    align-items: center;
+    margin-top: 10vh;
+    margin-bottom: 10vh;
+    flex-grow: 1;
+    justify-content: center;
+    
+}
+
+#clicker {
+   background-color: black;
+   color: white;
+   border: 1px solid white;
+   border-radius: 2px;
+   padding: 60px 80px;
+   outline-style: none;
+   transition: all;
+   font-size: 70px;
+}
+
+#clicker:focus {
+    -webkit-animation: beat 0.1s ease-in-out backwards;
+            animation: beat 0.1s ease-in-out backwards;
+}
+
+#clicker:active {
+    -webkit-animation: none;
+            animation: none;
+}
+
+#clicker:hover {
+    color: black;
+    background-color: white;
+}
+
+.right-content, .left-content {
+    align-items: flex-start;
+}
+
+.right-content {
+    border-top: 2px solid white;
+    border-bottom: 2px solid white;
+    border-left: 2px solid white;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 333px;
+}
+
+#status-content {
+    flex-grow: 3;
+}
+
+#infos {
+    justify-self: flex-end;
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.center-content {
+    margin-inline: 60px;
+}
+
+.left-content {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0;
+    align-items: stretch;
+    max-width: 335px;
+}
+
+#mercado {
+    flex-grow: 3;
+    border-right: 2px solid white;
+    border-top: 2px solid white;
+    border-bottom: 2px solid white;
+    display: flex;
+    flex-direction: column;
+    max-width: 340px;
+}
+
+.upgrade {
+   background-color: black;
+   color: white;
+   border: 1px solid white;
+   border-radius: 2px;
+   padding: 5px;
+   margin: 10px;
+   outline-style: none;
+   transition: all;
+   font-size: 20px;
+   max-width: 328px;
+}
+
+.upgrade-sn {
+    background-color: black;
+    color: white;
+    border: 1px solid white;
+    border-radius: 2px;
+    padding: 5px;
+    margin: 10px;
+    outline-style: none;
+    transition: all;
+    font-size: 20px;
+    max-width: 328px;
+ }
+
+.upgrade:hover {
+    color: black;
+    background-color: white;
+}
