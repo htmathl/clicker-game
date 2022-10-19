@@ -16,6 +16,12 @@
 
 * {
     font-family: fontinha;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none; 
+    -khtml-user-select: none;
+    -moz-user-select: none; 
+    -ms-user-select: none; 
+    user-select: none; 
 }
 
 html, body {
@@ -89,11 +95,12 @@ div.flex {
 
 #status-content {
     flex-grow: 3;
+    font-size: 30px;
 }
 
 #infos {
     justify-self: flex-end;
-    font-size: 30px;
+    font-size: 25px;
     margin-bottom: 10px;
 }
 
@@ -122,20 +129,19 @@ div.flex {
 .upgrade {
    background-color: black;
    color: white;
-   border: 1px solid white;
+   border-bottom: 1px solid white;
    border-radius: 2px;
    padding: 5px;
    margin: 10px;
    outline-style: none;
    transition: all;
-   font-size: 20px;
+   font-size: 25px;
    max-width: 328px;
 }
 
 .upgrade-sn {
     background-color: black;
     color: white;
-    border: 1px solid white;
     border-radius: 2px;
     padding: 5px;
     margin: 10px;

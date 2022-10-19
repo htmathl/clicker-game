@@ -2,145 +2,300 @@ let butao = document.getElementById('clicker');
 let contador = document.getElementById('contador');
 let mercado = document.getElementById('mercado');
 let infos = document.getElementById('infos');
+let statusContent = document.getElementById('status-content');
 
 let btnUpgrade, btnsUpgrade = [];
-let exists;
+let exists, clicks = [], SecupClicks = 0;
+
+let intervalo_mortoVivo, intervalo_guerreiroMV, 
+intervalo_aranha, intervalo_gargula, intervalo_chimera, 
+intervalo_giganteFerro, intervalo_protetoresRainha, intervalo_filhasPerdicao, 
+intervalo_reiDosMortosVivos, intervalo_caoGuardiaoTumulo, intervalo_reiCaido,
+intervalo_ceifadorEscuridao, intervalo_guardiaFogo, intervalo_devoradorAlmas,
+intervalo_primeiroMortoVivo;
+
+let intervalos = { intervalo_mortoVivo, intervalo_guerreiroMV, 
+intervalo_aranha, intervalo_gargula, intervalo_chimera, 
+intervalo_giganteFerro, intervalo_protetoresRainha, intervalo_filhasPerdicao, 
+intervalo_reiDosMortosVivos, intervalo_caoGuardiaoTumulo, intervalo_reiCaido,
+intervalo_ceifadorEscuridao, intervalo_guardiaFogo, intervalo_devoradorAlmas,
+intervalo_primeiroMortoVivo };
+
+'use strict';
+class gerarClick {
+    #upClicks = 0;
+    #almas = 0;
+    constructor() {
+        this.GetVariable = function () {
+            return this.#upClicks;
+        };
+        this.SetVariable = function (upClicks) {
+            this.#upClicks = upClicks;
+        };
+        this.GetVariableA = function () {
+            return this.#almas;
+        };
+        this.SetVariableA = function (almas) {
+            this.#almas += almas;
+        };
+        this.SetVariableAM = function(almas) {
+            this.#almas -= almas;
+        }
+    }
+}
+
+let instance = new gerarClick();
 
 let upgrades = [
     mortoVivo = {
         id: 'mortoVivo',
         nome: 'Morto Vivo',
-        info: 'Você ganhará uma alma a cada segundo',
+        info: '-Você ganhará uma alma a cada segundo \n -A cada 5 niveis upados você ganhará 10 almas por clique',
+        quantos: 0,
         custo: 25,
-        aumento: 10,
-        bonus: 10,
-        segundos: 1
+        aumento: 1.5,
+        bonus: 1,
+        rendimento: 0,
+        segundos: 1,
+        status: function () {
+            return `Quantidade: ${this.quantos}
+                    Custo: ${this.custo} almas
+                    Rendimento: ${this.rendimento}/s`;
+        },
+        upClick: function () {
+            for(let i = 0; i <= this.quantos; i++) {
+                if( i % 5 == 0 && i != 0 ) {
+                    if( !clicks.includes(i) )
+                        clicks.push(i);
+                    instance.SetVariable((10 * clicks.length));
+                    SecupClicks = (10 * clicks.length);
+                }
+            }
+        }
     },
     guerreiroMV = {
         id: 'guerreiroMV',
         nome: 'Guerreiro Morto Vivo',
         info: 'Você ganhará 50 almas a cada 20s',
-        custo: 30,
-        aumento: 20,
+        quantos: 0,
+        custo: 100,
+        aumento: 1.5,
         bonus: 50,
-        segundos: 20
+        rendimento: 0,
+        segundos: 20,
+        status: function () {
+            return `Quantidade: ${this.quantos}
+                    Custo: ${this.custo} almas 
+                    Rendimento: ${this.rendimento}/${this.segundos}s`;
+        }
     },
     aranha = {
         id: 'aranha',
         nome: 'Aranha',
         info: 'Você ganhará uma alma a cada segundo',
+        quantos: 0,
         custo: 10000,
-        aumento: 15000,
+        aumento: 1.5,
         bonus: 100,
+        rendimento: 0,
         segundos: 50,
+        status: function () {
+            return `Quantidade: ${this.quantos}
+                    Custo: ${this.custo} almas
+                    Rendimento: ${this.rendimento}/${this.segundos}s`;
+        }
     },
     gargula = {
         id: 'gargula',
         nome: 'Gárgula',
         info: 'Você ganhará uma alma a cada segundo',
+        quantos: 0,
         custo: 30000,
-        aumento: 40000,
+        aumento: 1.5,
         bonus: 250,
-        segundos: 90
+        rendimento: 0,
+        segundos: 90,
+        status: function () {
+            return `Quantidade: ${this.quantos}
+                    Custo: ${this.custo} 
+                    Rendimento: ${this.rendimento}/${this.segundos}s`;
+        }
     },
     chimera = {
         id: 'chimera',
         nome: 'Chimera',
         info: 'Você ganhará uma alma a cada segundo',
+        quantos: 0,
         custo: 75000,
-        aumento: 80000,
+        aumento: 1.5,
         bonus: 500,
-        segundos: 150
+        rendimento: 0,
+        segundos: 150,
+        status: function () {
+            return `Mortos Vivos: ${this.quantos}
+                    Custo: ${this.custo} 
+                    Rendimento: ${this.rendimento}/${this.segundos}s`;
+        }
     },
     giganteFerro = {
         id: 'giganteFerro',
         nome: 'Gigante de Ferro',
         info: 'Você ganhará uma alma a cada segundo',
+        quantos: 0,
         custo: 125000,
-        aumento: 140000,
+        aumento: 1.5,
         bonus: 1000,
-        segundos: 210
+        rendimento: 0,
+        segundos: 210,
+        status: function () {
+            return `Mortos Vivos: ${this.quantos}
+                    Custo: ${this.custo} 
+                    Rendimento: ${this.rendimento}/${this.segundos}s`;
+        }
     },
     protetoresRainha = {
         id: 'protetoresRainha',
         nome: 'Protetores da Raínha',
         info: 'Você ganhará uma alma a cada segundo',
+        quantos: 0,
         custo: 175000,
-        aumento: 200000,
+        aumento: 1.5,
         bonus: 2000,
-        segundos: 300
+        rendimento: 0,
+        segundos: 300,
+        status: function () {
+            return `Mortos Vivos: ${this.quantos}
+                    Custo: ${this.custo} 
+                    Rendimento: ${this.rendimento}/${this.segundos}s`;
+        }
     },
     filhasPerdicao = {
         id: 'filhasPerdicao',
         nome: 'Filhas da Perdição',
         info: 'Você ganhará uma alma a cada segundo',
+        quantos: 0,
         custo: 500000,
-        aumento: 700000,
+        aumento: 1.5,
         bonus: 5000,
-        segundos: 390
+        rendimento: 0,
+        segundos: 390,
+        status: function () {
+            return `Mortos Vivos: ${this.quantos}
+                    Custo: ${this.custo} 
+                    Rendimento: ${this.rendimento}/${this.segundos}s`;
+        }
     },
     reiDosMortosVivos = {
         id: 'reiDosMortosVivos',
         nome: 'Rei dos Mortos Vivos',
         info: 'Você ganhará uma alma a cada segundo',
+        quantos: 0,
         custo: 750000,
-        aumento: 800000,
+        aumento: 1.5,
         bonus: 10000,
-        segundos: 450
+        rendimento: 0,
+        segundos: 450,
+        status: function () {
+            return `Mortos Vivos: ${this.quantos}
+                    Custo: ${this.custo} 
+                    Rendimento: ${this.rendimento}/${this.segundos}s`;
+        }
     },
     caoGuardiaoTumulo = {
         id: 'caoGuardiaoTumulo',
         nome: 'Cão Guardião do Túmulo',
         info: 'Você ganhará uma alma a cada segundo',
+        quantos: 0,
         custo: 1000000000,
-        aumento: 1000000000,
+        aumento: 1.5,
         bonus: 20000,
-        segundos: 510
+        rendimento: 0,
+        segundos: 510,
+        status: function () {
+            return `Mortos Vivos: ${this.quantos}
+                    Custo: ${this.custo} 
+                    Rendimento: ${this.rendimento}/${this.segundos}s`;
+        }
     },
     reiCaido = {
         id: 'reiCaido',
         nome: 'Rei Caído',
         info: 'Você ganhará uma alma a cada segundo',
+        quantos: 0,
         custo: 10000000000,
-        aumento: 1000000000,
+        aumento: 2,
         bonus: 50000,
-        segundos: 600
+        rendimento: 0,
+        segundos: 600,
+        status: function () {
+            return `Mortos Vivos: ${this.quantos}
+                    Custo: ${this.custo} 
+                    Rendimento: ${this.rendimento}/${this.segundos}s`;
+        }
     },
     ceifadorEscuridao = {
         id: 'ceifadorEscuridao',
         nome: 'Ceifador da Escuridão',
         info: 'Você ganhará uma alma a cada segundo',
+        quantos: 0,
         custo: 500000000000,
-        aumento: 1000000000,
+        aumento: 2,
         bonus: 10000000000,
-        segundos: 720
+        rendimento: 0,
+        segundos: 720,
+        status: function () {
+            return `Mortos Vivos: ${this.quantos}
+                    Custo: ${this.custo} 
+                    Rendimento: ${this.rendimento}/${this.segundos}s`;
+        }
     },
     guardiaFogo = {
         id: 'guardiaFogo',
         nome: 'Guardiã do Fogo',
         info: 'Você ganhará uma alma a cada segundo',
+        quantos: 0,
         custo: 1000000000000,
-        aumento: 1000000000,
+        aumento: 2,
         bonus: 50000000000,
-        segundos: 780
+        rendimento: 0,
+        segundos: 780,
+        status: function () {
+            return `Mortos Vivos: ${this.quantos}
+                    Custo: ${this.custo} 
+                    Rendimento: ${this.rendimento}/${this.segundos}s`;
+        }
     },
     devoradorAlmas = {
         id: 'devoradorAlmas',
         nome: 'Devorador de Almas',
         info: 'Você ganhará uma alma a cada segundo',
+        quantos: 0,
         custo: 50000000000000,
-        aumento: 1000000000,
+        aumento: 2.5,
         bonus: 100000000000,
-        segundos: 900
+        rendimento: 0,
+        segundos: 900,
+        status: function () {
+            return `Mortos Vivos: ${this.quantos}
+                    Custo: ${this.custo} 
+                    Rendimento: ${this.rendimento}/${this.segundos}s`;
+        }
     },
     primeiroMortoVivo = {
         id: 'primeiroMortoVivo',
         nome: 'Primeiro Morto Vivo',
         info: 'Você ganhará uma alma a cada segundo',
+        quantos: 0,
         custo: 1000000000000000,
-        aumento: 1000000000,
+        aumento: 2.5,
         bonus: 9000000000000,
-        segundos: 1200
+        rendimento: 0,
+        segundos: 1200,
+        status: function () {
+            return `Mortos Vivos: ${this.quantos}
+                    Custo: ${this.custo} 
+                    Rendimento: ${this.rendimento}/${this.segundos}s`;
+        }
     }
 ];
 
@@ -154,51 +309,79 @@ for (let i = 0; i < upgrades.length; i++) {
 butao.removeEventListener('click', contar);
 butao.addEventListener('click', contar);
 
-setInterval(() => {
+let interval = setInterval(() => {
     checar();
-}, 100)
+}, 100);
 
 function contar() {
-    contador.innerText = parseInt(contador.innerText) + 1;
+    if( instance.GetVariable() == 0 )
+        instance.SetVariableA(1);
+    else
+        instance.SetVariableA(instance.GetVariable());
+
+    contador.innerText = instance.GetVariableA();
 }
 
-function maior(custo, bonus, segundos) {
-    if( parseInt(contador.innerText) >= custo ) {
-        contador.innerText = parseInt(contador.innerText) - custo;
-        setInterval(() => {
-            contador.innerText = parseInt(contador.innerText) + bonus;
+function maior(custo, bonus, segundos, quantos, id) {
+    if( instance.GetVariableA() >= custo ) {
+        instance.SetVariableAM(custo);
+        contador.innerText = instance.GetVariableA();
+        clearInterval(intervalos[`intervalo_${id}`]);
+        intervalos[`intervalo_${id}`] = setInterval(() => {
+            instance.SetVariableA((bonus*quantos));
+            contador.innerText = instance.GetVariableA();
         }, (segundos*1000));
     }
 }
 
-function verificarMouse(m) {
-    btnsUpgrade[m].addEventListener('mouseover', () => {
-        infos.innerText = upgrades[m].info;
-    });
-    btnsUpgrade[m].addEventListener('mouseout', () => {
-        infos.innerText = '';
-    });
+var checarMaior = function(m) {
+    upgrades.forEach(e => {
+        if( e.nome == m.currentTarget.innerText ) {
+            e.quantos ++;
+            maior(e.custo, e.bonus, e.segundos, e.quantos, e.id);
+            e.rendimento += e.bonus;
+            e.custo += Math.round(e.aumento * e.custo);
+            statusContent.innerText = e.status();
+            e.upClick ? e.upClick() : false;
+        }
+    });  
 }
 
 function checar() {
     for (let m = 0; m < upgrades.length; m++) {
         exists = document.getElementById(upgrades[m].id);
-        btnsUpgrade[m].disabled = false;
-        btnsUpgrade[m].classList.remove('upgrade-sn');
-        btnsUpgrade[m].setAttribute('class', 'upgrade');
-        if(parseInt(contador.innerText) >= upgrades[m].custo && !exists) {
+
+        //adicionar ups
+        if(instance.GetVariableA() >= upgrades[m].custo && !exists) {
             mercado.appendChild(btnsUpgrade[m]);
             btnsUpgrade[m].innerText = upgrades[m].nome;
-            btnsUpgrade[m].addEventListener('click', () => {
-                maior(upgrades[m].custo, upgrades[m].bonus, upgrades[m].segundos);
-                upgrades[m].custo += upgrades[m].aumento;
-            });
-            verificarMouse(m);
         }
-        if( parseInt(contador.innerText) < upgrades[m].custo && exists ) {
-            btnsUpgrade[m].disabled = true;
+
+        if( parseInt(contador.innerText) != instance.GetVariableA() || instance.GetVariable() != SecupClicks) {
+            clearInterval(interval);
+            window.location.reload();
+        }
+
+        //click ups
+        if ( instance.GetVariableA() >= upgrades[m].custo && exists ) {
+            btnsUpgrade[m].addEventListener('click', checarMaior);
+            btnsUpgrade[m].classList.remove('upgrade-sn');
+            btnsUpgrade[m].setAttribute('class', 'upgrade');
+        }
+
+        if( instance.GetVariableA() < upgrades[m].custo && exists ) {
+            btnsUpgrade[m].removeEventListener('click', checarMaior);
             btnsUpgrade[m].classList.remove('upgrade');
             btnsUpgrade[m].setAttribute('class', 'upgrade-sn');
         }
+
+        btnsUpgrade[m].addEventListener('mouseover', () => {
+            infos.innerText = upgrades[m].info;
+            statusContent.innerText = upgrades[m].status();
+        });
+        btnsUpgrade[m].addEventListener('mouseout', () => {
+            infos.innerText = '';
+            statusContent.innerText = '';
+        });   
     }
 }
