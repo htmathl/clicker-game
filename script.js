@@ -3,9 +3,11 @@ let contador = document.getElementById('contador');
 let mercado = document.getElementById('mercado');
 let infos = document.getElementById('infos');
 let statusContent = document.getElementById('status-content');
+let docs = document.getElementById('docs');
+let geraClick = document.getElementById('gera-click');
 
 let btnUpgrade, btnsUpgrade = [];
-let exists, clicks = [], SecupClicks = 0;
+let exists, clicks = [], SecupClicks = 0, SecAlmaTot = 0;
 
 let intervalo_mortoVivo, intervalo_guerreiroMV, 
 intervalo_aranha, intervalo_gargula, intervalo_chimera, 
@@ -21,10 +23,19 @@ intervalo_reiDosMortosVivos, intervalo_caoGuardiaoTumulo, intervalo_reiCaido,
 intervalo_ceifadorEscuridao, intervalo_guardiaFogo, intervalo_devoradorAlmas,
 intervalo_primeiroMortoVivo };
 
+//canvas set
+// let canvas = document.getElementById('checar-click');
+// let width = butao.getAttribute('width');
+// let height = butao.getAttribute('height');
+// canvas.setAttribute('width', width.toString());
+// canvas.setAttribute('height', height.toString());
+// canvas.style.backgroundColor = 'white';
+
 'use strict';
 class gerarClick {
     #upClicks = 0;
     #almas = 0;
+    #almasTotais = 0;
     constructor() {
         this.GetVariable = function () {
             return this.#upClicks;
@@ -40,6 +51,12 @@ class gerarClick {
         };
         this.SetVariableAM = function(almas) {
             this.#almas -= almas;
+        }
+        this.GetVariableAT = function() {
+            return this.#almasTotais;
+        }
+        this.SetVariableAT = function(almasTotais) {
+            this.#almasTotais += almasTotais;
         }
     }
 }
@@ -302,7 +319,7 @@ let upgrades = [
 for (let i = 0; i < upgrades.length; i++) {
     btnUpgrade = document.createElement('button');
     btnsUpgrade.push(btnUpgrade);
-    btnsUpgrade[i].setAttribute('class', 'upgrade');
+    btnsUpgrade[i].setAttribute('class', 'upgrade-sn');
     btnsUpgrade[i].setAttribute('id', upgrades[i].id);
 }
 
@@ -314,22 +331,34 @@ let interval = setInterval(() => {
 }, 100);
 
 function contar() {
-    if( instance.GetVariable() == 0 )
+    if( instance.GetVariable() == 0 ) {
+        instance.SetVariableAT(1);
         instance.SetVariableA(1);
-    else
+    }
+    else {
+        instance.SetVariableAT(instance.GetVariable());
         instance.SetVariableA(instance.GetVariable());
-
+    }
+    SecAlmaTot = instance.GetVariableAT();
     contador.innerText = instance.GetVariableA();
+    docs.innerText = `${instance.GetVariableAT()} almas coletadas`
 }
 
 function maior(custo, bonus, segundos, quantos, id) {
     if( instance.GetVariableA() >= custo ) {
         instance.SetVariableAM(custo);
         contador.innerText = instance.GetVariableA();
+        let rendt = parseFloat(geraClick.innerText.split(' ')[0]) + (bonus/segundos);
+        rendt.toString().split('.').length > 1 ? rendt = rendt.toFixed(1) : rendt = Math.round(rendt);
+        geraClick.innerText = `${rendt} A/s`;
         clearInterval(intervalos[`intervalo_${id}`]);
         intervalos[`intervalo_${id}`] = setInterval(() => {
-            instance.SetVariableA((bonus*quantos));
+            let rend = bonus*quantos;
+            instance.SetVariableA(rend);
+            instance.SetVariableAT(rend);
+            SecAlmaTot = instance.GetVariableAT();
             contador.innerText = instance.GetVariableA();
+            docs.innerText = `${instance.GetVariableAT()} almas coletadas`;
         }, (segundos*1000));
     }
 }
@@ -352,12 +381,12 @@ function checar() {
         exists = document.getElementById(upgrades[m].id);
 
         //adicionar ups
-        if(instance.GetVariableA() >= upgrades[m].custo && !exists) {
+        if(instance.GetVariableAT() >= upgrades[m].custo && !exists) {
             mercado.appendChild(btnsUpgrade[m]);
             btnsUpgrade[m].innerText = upgrades[m].nome;
         }
 
-        if( parseInt(contador.innerText) != instance.GetVariableA() || instance.GetVariable() != SecupClicks) {
+        if( parseInt(contador.innerText) != instance.GetVariableA() || instance.GetVariable() != SecupClicks || instance.GetVariableAT() != SecAlmaTot ) {
             clearInterval(interval);
             window.location.reload();
         }

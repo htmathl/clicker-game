@@ -79,6 +79,11 @@ div.flex {
     background-color: white;
 }
 
+#clickAni {
+    position: absolute;
+    font-size: 50px;
+}
+
 .right-content, .left-content {
     align-items: flex-start;
 }
@@ -91,6 +96,12 @@ div.flex {
     flex-direction: column;
     align-items: stretch;
     max-width: 333px;
+}
+
+#docs {
+    font-size: 30px;
+    margin-bottom: 20px;
+    font-weight: bold;
 }
 
 #status-content {
@@ -106,6 +117,16 @@ div.flex {
 
 .center-content {
     margin-inline: 60px;
+    display: flex;
+    flex-direction: column;
+}
+
+#gera-click {
+    flex-grow: 0;
+    position: absolute;
+    top: 65%;
+    font-size: 35px;
+    font-weight: bold;
 }
 
 .left-content {
