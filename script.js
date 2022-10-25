@@ -5,6 +5,10 @@ let infos = document.getElementById('infos');
 let statusContent = document.getElementById('status-content');
 let docs = document.getElementById('docs');
 let geraClick = document.getElementById('gera-click');
+let numClick = document.getElementById('num-click');
+let leftContent = document.querySelector("body > div.flex > div.flex-content.left-content");
+let rightContent = document.querySelector("body > div.flex > div.flex-content.right-content");
+let centerContent = document.querySelector("body > div.flex > div.flex-content.center-content");
 
 let btnUpgrade, btnsUpgrade = [];
 let exists, clicks = [], SecupClicks = 0, SecAlmaTot = 0;
@@ -23,19 +27,12 @@ intervalo_reiDosMortosVivos, intervalo_caoGuardiaoTumulo, intervalo_reiCaido,
 intervalo_ceifadorEscuridao, intervalo_guardiaFogo, intervalo_devoradorAlmas,
 intervalo_primeiroMortoVivo };
 
-//canvas set
-// let canvas = document.getElementById('checar-click');
-// let width = butao.getAttribute('width');
-// let height = butao.getAttribute('height');
-// canvas.setAttribute('width', width.toString());
-// canvas.setAttribute('height', height.toString());
-// canvas.style.backgroundColor = 'white';
-
 'use strict';
 class gerarClick {
     #upClicks = 0;
     #almas = 0;
     #almasTotais = 0;
+    #segundosIn = false;
     constructor() {
         this.GetVariable = function () {
             return this.#upClicks;
@@ -58,6 +55,12 @@ class gerarClick {
         this.SetVariableAT = function(almasTotais) {
             this.#almasTotais += almasTotais;
         }
+        this.GetSegundosIn = function() {
+            return this.#segundosIn;
+        }
+        this.SetSegundosIn = function(segundosIn) {
+            this.#segundosIn = segundosIn;
+        }
     }
 }
 
@@ -67,7 +70,7 @@ let upgrades = [
     mortoVivo = {
         id: 'mortoVivo',
         nome: 'Morto Vivo',
-        info: '-Você ganhará uma alma a cada segundo \n -A cada 5 niveis upados você ganhará 10 almas por clique',
+        info: '-Você ganhará uma alma a cada segundo \n -A cada 5 niveis upados você ganhará 10  almas + seu bonus atual, por cada clique',
         quantos: 0,
         custo: 25,
         aumento: 1.5,
@@ -82,10 +85,11 @@ let upgrades = [
         upClick: function () {
             for(let i = 0; i <= this.quantos; i++) {
                 if( i % 5 == 0 && i != 0 ) {
-                    if( !clicks.includes(i) )
+                    if( !clicks.includes(i) ) {
                         clicks.push(i);
-                    instance.SetVariable((10 * clicks.length));
-                    SecupClicks = (10 * clicks.length);
+                        instance.SetVariable( instance.GetVariable() + (10 * clicks.length));
+                        SecupClicks += (10 * clicks.length);
+                    }
                 }
             }
         }
@@ -93,17 +97,28 @@ let upgrades = [
     guerreiroMV = {
         id: 'guerreiroMV',
         nome: 'Guerreiro Morto Vivo',
-        info: 'Você ganhará 50 almas a cada 20s',
+        info: '-Você ganhará 50 almas a cada 20s \n -A cada Guerreiro Morto Vivo comprado diminuirá 2s do seu rendimento ao próximo',
         quantos: 0,
         custo: 100,
         aumento: 1.5,
         bonus: 50,
         rendimento: 0,
         segundos: 20,
+        segundosIn: 20,
         status: function () {
             return `Quantidade: ${this.quantos}
                     Custo: ${this.custo} almas 
                     Rendimento: ${this.rendimento}/${this.segundos}s`;
+        },
+        upProprio: function () {
+            let ups = [];
+            instance.GetSegundosIn() == false ? instance.SetSegundosIn(this.segundos) : false;
+            for( let i = 0; i <= this.quantos; i++ ) {
+                if( !ups.includes(i) && i > 1)
+                    ups.push(i);
+                this.segundos = instance.GetSegundosIn() - 2 * ups.length;
+            }
+            instance.SetSegundosIn(false);
         }
     },
     aranha = {
@@ -323,34 +338,50 @@ for (let i = 0; i < upgrades.length; i++) {
     btnsUpgrade[i].setAttribute('id', upgrades[i].id);
 }
 
+setTimeout(() => {
+    centerContent.classList.add('rcl-content-active');
+}, 1000);
+
+butao.addEventListener('click', (e) => {
+    numClick.style.top = (e.clientY + 5).toString() + 'px';
+    numClick.style.left = (e.clientX + 5).toString() + 'px';
+});
+
 butao.removeEventListener('click', contar);
 butao.addEventListener('click', contar);
 
-let interval = setInterval(() => {
-    checar();
-}, 100);
+let interval = setInterval(() => { checar(); }, 100);
 
 function contar() {
-    if( instance.GetVariable() == 0 ) {
-        instance.SetVariableAT(1);
-        instance.SetVariableA(1);
+    if( !rightContent.classList.contains('rcl-content-active') || !leftContent.classList.contains('rcl-content-active') ) {
+        setTimeout(() => {
+            leftContent.classList.add('rcl-content-active');
+            rightContent.classList.add('rcl-content-active');
+            instance.SetVariableAT(1);
+            instance.SetVariableA(1);
+            SecAlmaTot = instance.GetVariableAT();
+            contador.innerText = instance.GetVariableA();
+            docs.innerText = `${instance.GetVariableAT()} almas coletadas`;
+        }, 200);
+    } else {
+        if( instance.GetVariable() == 0 ) {
+            instance.SetVariableAT(1);
+            instance.SetVariableA(1);
+        }
+        else {
+            instance.SetVariableAT(instance.GetVariable());
+            instance.SetVariableA(instance.GetVariable());
+        }
+        SecAlmaTot = instance.GetVariableAT();
+        contador.innerText = instance.GetVariableA();
+        docs.innerText = `${instance.GetVariableAT()} almas coletadas`;
     }
-    else {
-        instance.SetVariableAT(instance.GetVariable());
-        instance.SetVariableA(instance.GetVariable());
-    }
-    SecAlmaTot = instance.GetVariableAT();
-    contador.innerText = instance.GetVariableA();
-    docs.innerText = `${instance.GetVariableAT()} almas coletadas`
 }
 
 function maior(custo, bonus, segundos, quantos, id) {
     if( instance.GetVariableA() >= custo ) {
         instance.SetVariableAM(custo);
         contador.innerText = instance.GetVariableA();
-        let rendt = parseFloat(geraClick.innerText.split(' ')[0]) + (bonus/segundos);
-        rendt.toString().split('.').length > 1 ? rendt = rendt.toFixed(1) : rendt = Math.round(rendt);
-        geraClick.innerText = `${rendt} A/s`;
         clearInterval(intervalos[`intervalo_${id}`]);
         intervalos[`intervalo_${id}`] = setInterval(() => {
             let rend = bonus*quantos;
@@ -367,11 +398,16 @@ var checarMaior = function(m) {
     upgrades.forEach(e => {
         if( e.nome == m.currentTarget.innerText ) {
             e.quantos ++;
+            e.upProprio ? e.upProprio() : false; 
             maior(e.custo, e.bonus, e.segundos, e.quantos, e.id);
             e.rendimento += e.bonus;
             e.custo += Math.round(e.aumento * e.custo);
-            statusContent.innerText = e.status();
             e.upClick ? e.upClick() : false;
+            statusContent.innerText = e.status();
+            let rendt = parseFloat(geraClick.innerText.split(' ')[0]) + (e.bonus/e.segundos);
+            !rendt > 0 ? true : geraClick.style.opacity = '1' ;
+            rendt.toString().split('.').length > 1 ? rendt = rendt.toFixed(1) : rendt = Math.round(rendt);
+            geraClick.innerText = `${rendt} A/s`;
         }
     });  
 }
@@ -380,28 +416,35 @@ function checar() {
     for (let m = 0; m < upgrades.length; m++) {
         exists = document.getElementById(upgrades[m].id);
 
-        //adicionar ups
-        if(instance.GetVariableAT() >= upgrades[m].custo && !exists) {
-            mercado.appendChild(btnsUpgrade[m]);
-            btnsUpgrade[m].innerText = upgrades[m].nome;
+        switch( !exists ) {
+            case true:
+                 //adicionar ups
+                if(instance.GetVariableAT() >= upgrades[m].custo ) {
+                    mercado.appendChild(btnsUpgrade[m]);
+                    btnsUpgrade[m].innerText = upgrades[m].nome;
+                }
+                break;
+            case false:
+                //click ups
+                if ( instance.GetVariableA() >= upgrades[m].custo ) {
+                    btnsUpgrade[m].addEventListener('click', checarMaior);
+                    btnsUpgrade[m].classList.remove('upgrade-sn');
+                    btnsUpgrade[m].setAttribute('class', 'upgrade');
+                }
+
+                if( instance.GetVariableA() < upgrades[m].custo ) {
+                    btnsUpgrade[m].removeEventListener('click', checarMaior);
+                    btnsUpgrade[m].classList.remove('upgrade');
+                    btnsUpgrade[m].setAttribute('class', 'upgrade-sn');
+                }
+                break;
+            default:
+                break;
         }
 
         if( parseInt(contador.innerText) != instance.GetVariableA() || instance.GetVariable() != SecupClicks || instance.GetVariableAT() != SecAlmaTot ) {
             clearInterval(interval);
             window.location.reload();
-        }
-
-        //click ups
-        if ( instance.GetVariableA() >= upgrades[m].custo && exists ) {
-            btnsUpgrade[m].addEventListener('click', checarMaior);
-            btnsUpgrade[m].classList.remove('upgrade-sn');
-            btnsUpgrade[m].setAttribute('class', 'upgrade');
-        }
-
-        if( instance.GetVariableA() < upgrades[m].custo && exists ) {
-            btnsUpgrade[m].removeEventListener('click', checarMaior);
-            btnsUpgrade[m].classList.remove('upgrade');
-            btnsUpgrade[m].setAttribute('class', 'upgrade-sn');
         }
 
         btnsUpgrade[m].addEventListener('mouseover', () => {
