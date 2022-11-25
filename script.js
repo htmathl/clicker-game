@@ -9,6 +9,7 @@ let numClick = document.getElementById('num-click');
 let leftContent = document.querySelector("body > div.flex > div.flex-content.left-content");
 let rightContent = document.querySelector("body > div.flex > div.flex-content.right-content");
 let centerContent = document.querySelector("body > div.flex > div.flex-content.center-content");
+let numClickSpan = document.getElementById('num-click-span');
 
 let btnUpgrade, btnsUpgrade = [];
 let exists, clicks = [], SecupClicks = 0, SecAlmaTot = 0;
@@ -65,6 +66,9 @@ class gerarClick {
 }
 
 let instance = new gerarClick();
+
+numClick.style.height = butao.getBoundingClientRect().height.toFixed(2).toString() + 'px';
+numClick.style.width = butao.getBoundingClientRect().width.toFixed(2).toString() + 'px';
 
 let upgrades = [
     mortoVivo = {
@@ -342,11 +346,6 @@ setTimeout(() => {
     centerContent.classList.add('rcl-content-active');
 }, 1000);
 
-butao.addEventListener('click', (e) => {
-    numClick.style.top = (e.clientY + 5).toString() + 'px';
-    numClick.style.left = (e.clientX + 5).toString() + 'px';
-});
-
 butao.removeEventListener('click', contar);
 butao.addEventListener('click', contar);
 
@@ -457,3 +456,20 @@ function checar() {
         });   
     }
 }
+
+butao.addEventListener('click', (e) => {
+    let random = [ -50, -45, 15, 25 ];
+    let span = document.createElement('span');
+    numClick.appendChild(span);
+    span.style.top = (e.clientY) + 'px';
+    span.style.left = (e.clientX + 25) + 'px'; 
+    instance.GetVariable() != 0 ? span.innerText = `+${instance.GetVariable()}` : span.innerText = '+1';
+    span.style.opacity = '1';
+    setTimeout(() => { 
+        span.style.top = (e.clientY - 20)+ 'px';
+        setTimeout(() => {
+            span.style.opacity = '0';
+            numClick.removeChild(span);
+        }, 400);
+    }, 100);
+});

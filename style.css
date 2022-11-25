@@ -53,7 +53,7 @@ body {
 }
 
 #clicker {
-   background-color: black;
+   background-color: transparent;
    color: white;
    border: 1px solid white;
    border-radius: 2px;
@@ -61,6 +61,7 @@ body {
    outline-style: none;
    transition: all;
    font-size: 70px;
+   z-index: 2;
 }
 
 #clicker:focus {
@@ -156,9 +157,16 @@ body {
 }
 
 #num-click > span {
+    display: flex;
+    position: fixed;
     font-size: 60px;
-    height: 45px;
+    color: rgba(140, 140, 140, 0.703);
+    font-weight: bold;
+    height: 0;
     line-height: 15px;
+    opacity: 0;
+    transition: all 0.5s ease-out;
+    z-index: 3;
 }
 
 #mercado {
