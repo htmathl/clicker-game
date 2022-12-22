@@ -446,15 +446,19 @@ function checar() {
             window.location.reload();
         }
 
-        btnsUpgrade[m].addEventListener('mouseover', () => {
-            infos.innerText = upgrades[m].info;
-            statusContent.innerText = upgrades[m].status();
-        });
-        btnsUpgrade[m].addEventListener('mouseout', () => {
-            infos.innerText = '';
-            statusContent.innerText = '';
-        });   
+        
     }
+}
+
+for(let i = 0; i < upgrades.length; i++) {
+    btnsUpgrade[i].addEventListener('mouseover', () => {
+        infos.innerText = upgrades[i].info;
+        statusContent.innerText = upgrades[i].status();
+    });
+    btnsUpgrade[i].addEventListener('mouseout', () => {
+        infos.innerText = '';
+        statusContent.innerText = '';
+    });   
 }
 
 butao.addEventListener('click', (e) => {
